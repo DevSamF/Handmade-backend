@@ -5,7 +5,20 @@ from database import SessionLocal, Base, engine
 from models import Post, Comment
 import shutil
 import os
+import json
+import firebase_admin
+from firebase_admin import credentials
 
+# Inicialização do Firebase Admin com variável de ambiente segura
+if not firebase_admin._apps:
+    cred_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    if not cred_json:
+        raise ValueError("Variável de ambiente GOOGLE_APPLICATION_CREDENTIALS_JSON não encontrada.")
+    cred_dict = json.loads(cred_json)
+    cred = credentials.Certificate(cred_dict)
+    firebase_admin.initialize_app(cred)
+
+# Configuração da API
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
